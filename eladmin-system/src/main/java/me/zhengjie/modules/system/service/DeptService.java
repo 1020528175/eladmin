@@ -21,6 +21,10 @@ public interface DeptService {
      * queryAll
      * @param criteria
      * @return
+     *  类上配置的value/cacheNames,指定的是这个类的所有带缓存注解的方法，缓存存放在哪块命名空间,如果方法上也指定了value/cacheNames，那这个方法就以方法上配置的作为这个方法缓存的命名空间
+     *  最后保存到redis的缓存key就是：命名空间::keyGenerator生成的结果   组成缓存的key
+     *  如:  dept::me.zhengjie.modules.system.service.impl.DeptServiceImplqueryAll467849810
+     *  keyGenerator = "keyGenerator",就是指定这个方法的缓存key的生成策略是keyGenerator，keyGenerator就是KeyGenerator(函数式接口)的实现类，在RedisConfig里面实例化了KeyGenerator的实现类
      */
     @Cacheable(keyGenerator = "keyGenerator")
     List<DeptDTO> queryAll(DeptQueryCriteria criteria);

@@ -17,15 +17,13 @@ public class EntityExistException extends RuntimeException {
     }
 
     private static String generateMessage(String entity, Map<String, String> saveBodyParams) {
-        return StringUtils.capitalize(entity) +
-                " 已存在 " +
-                saveBodyParams;
+        return StringUtils.capitalize(entity) + " 已存在 " + saveBodyParams;
     }
 
-    private static <K, V> Map<K, V> toMap(
-            Class<K> keyType, Class<V> valueType, Object... entries) {
-        if (entries.length % 2 == 1)
+    private static <K, V> Map<K, V> toMap(Class<K> keyType, Class<V> valueType, Object... entries) {
+        if (entries.length % 2 == 1){
             throw new IllegalArgumentException("Invalid entries");
+        }
         return IntStream.range(0, entries.length / 2).map(i -> i * 2)
                 .collect(HashMap::new,
                         (m, i) -> m.put(keyType.cast(entries[i]), valueType.cast(entries[i + 1])),

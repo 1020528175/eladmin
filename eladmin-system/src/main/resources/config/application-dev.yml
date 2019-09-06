@@ -3,10 +3,12 @@ spring:
   datasource:
     druid:
       type: com.alibaba.druid.pool.DruidDataSource
-      driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-      url: jdbc:log4jdbc:mysql://localhost:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
-      username: root
-      password: 123456
+#      driverClassName: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+      driverClassName: com.mysql.cj.jdbc.Driver
+#      url: jdbc:log4jdbc:mysql://192.168.1.101:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
+      url: jdbc:mysql://192.168.1.101:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8
+      username: eladmin
+      password: eladmin
 
       # 初始化配置
       initial-size: 3
@@ -40,13 +42,28 @@ spring:
     hibernate:
       # 生产环境设置成 none，避免程序运行时自动更新数据库结构
       ddl-auto: update
+    show-sql: true
+
+  redis:
+    host: 192.168.1.101
+    port: 6379
+
+#打印sql参数
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
 
 #jwt
 jwt:
   header: Authorization
   secret: mySecret
-  # token 过期时间 2个小时
-  expiration: 7200000
+  # token 过期时间 10个小时  10*60*60*1000 这种模式忘记怎么写了
+  expiration: 36000000
   auth:
     # 授权路径
     path: /login
@@ -60,3 +77,7 @@ generator:
 #是否开启 swagger-ui
 swagger:
   enabled: true
+
+#垃圾邮件识别码配置，支持数组，如：554 DT:SPM,554 DT:SPM   网易的是554 DT:SPM
+email:
+  spam: 554 DT:SPM

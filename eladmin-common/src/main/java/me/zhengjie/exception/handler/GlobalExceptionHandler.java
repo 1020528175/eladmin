@@ -16,6 +16,7 @@ import static org.springframework.http.HttpStatus.*;
 /**
  * @author Zheng Jie
  * @date 2018-11-23
+ * 全局异常捕获
  */
 @Slf4j
 @RestControllerAdvice
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity handleException(Throwable e){
         // 打印堆栈信息
         log.error(ThrowableUtil.getStackTrace(e));
-        ApiError apiError = new ApiError(BAD_REQUEST.value(),e.getMessage());
+        ApiError apiError = new ApiError(INTERNAL_SERVER_ERROR.value(),e.getMessage());
         return buildResponseEntity(apiError);
     }
 

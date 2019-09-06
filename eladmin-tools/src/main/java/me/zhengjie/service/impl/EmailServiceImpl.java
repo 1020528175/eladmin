@@ -11,6 +11,7 @@ import me.zhengjie.service.EmailService;
 import me.zhengjie.utils.ElAdminConstant;
 import me.zhengjie.utils.EncryptUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,9 @@ import java.util.Optional;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class EmailServiceImpl implements EmailService {
+
+    @Value("${email.spam}")
+    private String[] spams;
 
     @Autowired
     private EmailRepository emailRepository;
@@ -80,6 +84,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             Mail.create(account)
                     .setTos(emailVo.getTos().toArray(new String[emailVo.getTos().size()]))
+                    .setCcs(emailVo.getCcs().toArray(new String[emailVo.getCcs().size()]))
                     .setTitle(emailVo.getSubject())
                     .setContent(content)
                     .setHtml(true)
@@ -87,7 +92,16 @@ public class EmailServiceImpl implements EmailService {
                     .setUseGlobalSession(false)
                     .send();
         }catch (Exception e){
-            throw new BadRequestException(e.getMessage());
+            //me.zhengjie.exception.BadRequestException: SMTPSendFailedException: 554 DT:SPM 163 smtp11,D8CowAB3j7dvcXBd5GkKCA--.59250S2 1567650170,please see http://mail.163.com/help/help_spam_16.htm?ip=171.212.221.60&hostid=smtp11&time=1567650170
+            //有可能会当成垃圾邮件而发送不出去，所以去掉了接口上的@Async注解，使发送邮件为同步发送
+            for (String spam : spams) {
+                if (e.getMessage().contains(spam)){
+                    //当成垃圾邮件了
+                    throw new RuntimeException("该邮件被识别为垃圾邮件，请勾选抄送自己，再重试");
+                }
+            }
+
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

@@ -35,7 +35,8 @@ public interface EmailService {
      * @param emailVo
      * @param emailConfig
      * @throws Exception
+     * //@Async 有可能会当成垃圾邮件而发送不出去，所以改成同步发送
      */
-    @Async
+
     void send(EmailVo emailVo, EmailConfig emailConfig) throws Exception;
 }

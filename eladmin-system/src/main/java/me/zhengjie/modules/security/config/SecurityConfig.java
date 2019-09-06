@@ -91,6 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js"
                 ).anonymous()
 
+                //permitAll() 方法指所有登录和未登录人员都可以访问，这个会经过 security filter
+                //anonymous() 所有人都能访问，但是这个不会经过  security filter
                 .antMatchers( HttpMethod.POST,"/auth/"+loginPath).anonymous()
                 .antMatchers("/auth/vCode").anonymous()
                 // 支付宝回调

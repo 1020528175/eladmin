@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Optional;
 
 /**
@@ -69,6 +70,7 @@ public class QiNiuServiceImpl implements QiNiuService {
         qiniuConfig.setId(1L);
         return qiNiuConfigRepository.save(qiniuConfig);
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)

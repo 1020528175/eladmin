@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class EmailConfig implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     /**
@@ -41,7 +42,7 @@ public class EmailConfig implements Serializable {
     private String pass;
 
     /**
-     * 收件人
+     * 发件人
      */
     @NotBlank
     @Column(name = "from_user")

@@ -28,7 +28,9 @@ import java.time.Duration;
 @Slf4j
 @Configuration
 @EnableCaching
-// 自动配置
+/**
+ * 自动配置
+ */
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(RedisProperties.class)
 public class RedisConfig extends CachingConfigurerSupport {
@@ -57,8 +59,9 @@ public class RedisConfig extends CachingConfigurerSupport {
         template.setHashValueSerializer(fastJsonRedisSerializer);
 
         // 全局开启AutoType，不建议使用
-        // ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
-        // 建议使用这种方式，小范围指定白名单
+        // ParserConfig.getGlobalInstance().setAutoTypeSupport(true)
+        // 建议使用这种方式，小范围指定白名单；参考：https://blog.csdn.net/liyantianmin/article/details/91890766
+        // 因为使用FastJsonRedisSerializer把对象序列化时是带了class类型的，反序列化时就可以自动根据这个class转换成对应的类型，这里配置的就是那些包下的对象可以自动反序列化成对应的对象
         ParserConfig.getGlobalInstance().addAccept("me.zhengjie.domain");
         ParserConfig.getGlobalInstance().addAccept("me.zhengjie.modules.system.service.dto");
         ParserConfig.getGlobalInstance().addAccept("me.zhengjie.modules.system.domain");
@@ -87,7 +90,7 @@ public class RedisConfig extends CachingConfigurerSupport {
             for (Object obj : params) {
                 sb.append(JSON.toJSONString(obj).hashCode());
             }
-            return sb.toString();
+            return sb.toString();//结果就类似于：me.zhengjie.modules.system.service.impl.DeptServiceImplqueryAll467849810
         };
     }
 }

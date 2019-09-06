@@ -38,7 +38,7 @@ public class LogServiceImpl implements LogService {
     @Autowired
     private LogSmallMapper logSmallMapper;
 
-    private final String LOGINPATH = "login";
+    private static final String LOGIN_PATH = "login";
 
     @Override
     public Object queryAll(LogQueryCriteria criteria, Pageable pageable){
@@ -85,7 +85,7 @@ public class LogServiceImpl implements LogService {
         // 获取IP地址
         log.setRequestIp(ip);
 
-        if(LOGINPATH.equals(signature.getName())){
+        if(LOGIN_PATH.equals(signature.getName())){
             try {
                 JSONObject jsonObject = new JSONObject(argValues[0]);
                 username = jsonObject.get("username").toString();
