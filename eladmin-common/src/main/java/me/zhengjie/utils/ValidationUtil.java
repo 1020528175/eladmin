@@ -16,9 +16,7 @@ public class ValidationUtil{
      */
     public static void isNull(Optional optional, String entity,String parameter , Object value){
         if(!optional.isPresent()){
-            String msg = entity
-                         + " 不存在 "
-                         +"{ "+ parameter +":"+ value.toString() +" }";
+            String msg = entity + " 不存在 " +"{ "+ parameter +":"+ value.toString() +" }";
             throw new BadRequestException(msg);
         }
     }

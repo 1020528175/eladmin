@@ -30,7 +30,7 @@ public interface ${className}Service {
     * @return
     */
     //@Cacheable(keyGenerator = "keyGenerator")
-    public Object queryAll(${className}QueryCriteria criteria);
+    Object queryAll(${className}QueryCriteria criteria);
 
     /**
      * findById

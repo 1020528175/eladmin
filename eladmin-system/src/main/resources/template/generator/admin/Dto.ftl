@@ -24,11 +24,15 @@ public class ${className}DTO implements Serializable {
     <#list columns as column>
 
     <#if column.columnComment != ''>
-    // ${column.columnComment}
+    /**
+    * ${column.columnComment}
+    */
     </#if>
     <#if column.columnKey = 'PRI'>
     <#if !auto && pkColumnType = 'Long'>
-    // 处理精度丢失问题
+    /**
+    * 处理精度丢失问题
+    */
     @JsonSerialize(using= ToStringSerializer.class)
     </#if>
     </#if>
