@@ -1,9 +1,10 @@
 package me.zhengjie.modules.mall.service.dto;
 
 import lombok.Data;
-import java.sql.Timestamp;
-import java.math.BigDecimal;
+
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 
 
 /**

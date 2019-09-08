@@ -8,6 +8,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
 * @author masterJ
 * @date 2019-09-06
@@ -30,7 +32,7 @@ public interface GoodsMonitorService {
     * @return
     */
     @Cacheable(keyGenerator = "keyGenerator")
-    Object queryAll(GoodsMonitorQueryCriteria criteria);
+    List<GoodsMonitorDTO> queryAll(GoodsMonitorQueryCriteria criteria);
 
     /**
      * findById

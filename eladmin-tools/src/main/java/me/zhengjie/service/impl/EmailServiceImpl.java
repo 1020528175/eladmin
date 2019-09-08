@@ -3,6 +3,7 @@ package me.zhengjie.service.impl;
 import cn.hutool.extra.mail.Mail;
 import cn.hutool.extra.mail.MailAccount;
 import cn.hutool.extra.mail.MailUtil;
+import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.domain.EmailConfig;
 import me.zhengjie.domain.vo.EmailVo;
 import me.zhengjie.exception.BadRequestException;
@@ -21,6 +22,7 @@ import java.util.Optional;
  * @author Zheng Jie
  * @date 2018-12-26
  */
+@Slf4j
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class EmailServiceImpl implements EmailService {
@@ -58,8 +60,8 @@ public class EmailServiceImpl implements EmailService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void send(EmailVo emailVo, EmailConfig emailConfig){
-        if(emailConfig == null){
-            throw new BadRequestException("请先配置，再操作");
+        if(emailConfig == null || emailConfig.getId() == null){
+            throw new BadRequestException("请先配置发件人邮箱，再操作");
         }
         /**
          * 封装
@@ -97,6 +99,7 @@ public class EmailServiceImpl implements EmailService {
             for (String spam : spams) {
                 if (e.getMessage().contains(spam)){
                     //当成垃圾邮件了
+                    log.error(e.getMessage());
                     throw new RuntimeException("该邮件被识别为垃圾邮件，请勾选抄送自己，再重试");
                 }
             }

@@ -39,6 +39,13 @@ public interface LogService {
     void save(String username, String ip, ProceedingJoinPoint joinPoint, Log log);
 
     /**
+     * 新增日志
+     * @param log  日志对象
+     */
+    @Async
+    void save(Log log);
+
+    /**
      * 查询异常详情
      * @param id
      * @return

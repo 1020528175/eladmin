@@ -10,6 +10,7 @@ import me.zhengjie.service.mapper.LogErrorMapper;
 import me.zhengjie.service.mapper.LogSmallMapper;
 import me.zhengjie.utils.PageUtil;
 import me.zhengjie.utils.QueryHelp;
+import me.zhengjie.utils.SecurityUtils;
 import me.zhengjie.utils.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -99,6 +100,15 @@ public class LogServiceImpl implements LogService {
         log.setParams(params + " }");
         logRepository.save(log);
     }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void save(Log log){
+        log.setUsername(SecurityUtils.getUsername());
+        logRepository.save(log);
+    }
+
 
     @Override
     public Object findByErrDetail(Long id) {

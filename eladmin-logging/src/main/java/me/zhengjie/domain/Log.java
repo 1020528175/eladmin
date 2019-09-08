@@ -1,7 +1,10 @@
 package me.zhengjie.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +18,8 @@ import java.sql.Timestamp;
 @Data
 @Table(name = "log")
 @NoArgsConstructor
+@AllArgsConstructor
+@Accessors(chain = true)
 public class Log  implements Serializable {
 
     @Id

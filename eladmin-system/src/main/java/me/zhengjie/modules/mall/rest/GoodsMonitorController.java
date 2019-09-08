@@ -1,9 +1,11 @@
 package me.zhengjie.modules.mall.rest;
 
+import cn.hutool.core.util.BooleanUtil;
 import me.zhengjie.aop.log.Log;
 import me.zhengjie.modules.mall.domain.GoodsMonitor;
 import me.zhengjie.modules.mall.service.GoodsMonitorService;
 import me.zhengjie.modules.mall.service.dto.GoodsMonitorQueryCriteria;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
