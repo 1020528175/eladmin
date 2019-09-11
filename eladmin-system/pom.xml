@@ -50,6 +50,7 @@
     </dependencies>
 
     <build>
+        <finalName>eladmin</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -63,6 +64,7 @@
                     <skipTests>true</skipTests>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

@@ -154,6 +154,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
             String name = "ip2region.db";
             int algorithm = DbSearcher.BTREE_ALGORITHM;
             DbConfig config = new DbConfig();
+
             File file = FileUtil.inputStreamToFile(new ClassPathResource(path).getStream(), name);
             DbSearcher searcher = new DbSearcher(config, file.getPath());
             Method method = null;

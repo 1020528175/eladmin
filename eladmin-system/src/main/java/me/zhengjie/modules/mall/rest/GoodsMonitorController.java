@@ -47,7 +47,7 @@ public class GoodsMonitorController {
     @ApiOperation(value = "修改GoodsMonitor")
     @PutMapping(value = "/goodsMonitor")
     @PreAuthorize("hasAnyRole('ADMIN','GOODSMONITOR_ALL','GOODSMONITOR_EDIT')")
-    public ResponseEntity update(@Validated @RequestBody GoodsMonitor resources){
+    public ResponseEntity update(@Validated(GoodsMonitor.Update.class) @RequestBody GoodsMonitor resources){
         goodsMonitorService.update(resources);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

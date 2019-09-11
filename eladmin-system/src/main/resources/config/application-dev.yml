@@ -1,3 +1,6 @@
+server:
+  servlet:
+    context-path: /eladmin
 #配置数据源
 spring:
   datasource:
@@ -7,6 +10,7 @@ spring:
       driverClassName: com.mysql.cj.jdbc.Driver
 #      url: jdbc:log4jdbc:mysql://192.168.1.101:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
       url: jdbc:mysql://39.100.224.233:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8
+#      url: jdbc:mysql://172.17.0.2:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8
       username: eladmin
       password: eladmin
 
@@ -23,8 +27,8 @@ spring:
       # 最大空闲时间
       min-evictable-idle-time-millis: 1800000
       test-while-idle: true
-      test-on-borrow: false
-      test-on-return: false
+      test-on-borrow: true
+      test-on-return: true
 
       validation-query: select 1
       # 配置监控统计拦截的filters
@@ -51,6 +55,7 @@ spring:
     jedis:
       pool:
         min-idle: 3
+
 #    lettuce:
 #      pool:
 #        min-idle: 3
@@ -86,6 +91,19 @@ generator:
 #是否开启 swagger-ui
 swagger:
   enabled: true
+
+#七牛云
+qiniu:
+  # 文件大小 /M
+  max-size: 15
+
+#邮箱验证码有效时间/分钟
+code:
+  expiration: 5
+
+#登录图形验证码有效时间/分钟
+loginCode:
+  expiration: 2
 
 #垃圾邮件识别码配置，支持数组，如：554 DT:SPM,554 DT:SPM   网易的是554 DT:SPM
 email:

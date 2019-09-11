@@ -2,6 +2,7 @@ package me.zhengjie.modules.mall.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.domain.EmailConfig;
 import me.zhengjie.domain.Log;
 import me.zhengjie.domain.vo.EmailVo;
@@ -38,6 +39,7 @@ import java.util.regex.Matcher;
 * @author masterJ
 * @date 2019-09-06
 */
+@Slf4j
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class GoodsMonitorServiceImpl implements GoodsMonitorService {
@@ -125,7 +127,7 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
     public void monitorGoodsPrice() {
         GoodsMonitorQueryCriteria goodsMonitorQueryCriteria = GoodsMonitorQueryCriteria.builder().deleteStatus(false).openStatus(true).build();
         List<GoodsMonitorDTO> goodsMonitorDTOS = this.queryAll(goodsMonitorQueryCriteria);
-        System.out.println("goodsMonitorDTOS = " + goodsMonitorDTOS);
+        log.info("定时任务监控商品===goodsMonitorDTOS => " + goodsMonitorDTOS);
         goodsMonitorDTOS.forEach(goodsMonitorDTO -> {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(goodsMonitorDTO.getLink(), String.class);
             String body = responseEntity.getBody();
@@ -137,7 +139,7 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
                     //发送降价邮件
                     EmailConfig emailConfig = emailService.find();
                     //封装发送邮件对象
-                    EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(goodsMonitorDTO.getEmail()))
+                    EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(goodsMonitorDTO.getEmail().split(",")))
                             .subject(String.format("你关注的商品《%s》降价了",goodsMonitorDTO.getTitle()))
                             .content(String.format("你关注的商品《%s》降价了, 现价：%s， 低于监控价：%s， 请及时购买！链接：%s",goodsMonitorDTO.getTitle(),price,goodsMonitorDTO.getMinPrice(),goodsMonitorDTO.getLink())).build();
                     try {
@@ -163,7 +165,7 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
                     //发送涨价邮件
                     EmailConfig emailConfig = emailService.find();
                     //封装发送邮件对象
-                    EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(goodsMonitorDTO.getEmail()))
+                    EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(goodsMonitorDTO.getEmail().split(",")))
                             .subject(String.format("你关注的商品《%s》涨价了",goodsMonitorDTO.getTitle()))
                             .content(String.format("你关注的商品《%s》涨价了, 现价：%s， 高于监控价：%s， 真为了感到悲伤！链接：%s",goodsMonitorDTO.getTitle(),price,goodsMonitorDTO.getMinPrice(),goodsMonitorDTO.getLink())).build();
                     try {

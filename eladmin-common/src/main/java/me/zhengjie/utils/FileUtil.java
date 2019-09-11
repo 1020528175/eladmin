@@ -1,6 +1,7 @@
 package me.zhengjie.utils;
 
 import cn.hutool.core.util.IdUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -11,6 +12,7 @@ import java.text.DecimalFormat;
  * @author Zheng Jie
  * @date 2018-12-27
  */
+@Slf4j
 public class FileUtil extends cn.hutool.core.io.FileUtil {
 
     /**
@@ -125,7 +127,10 @@ public class FileUtil extends cn.hutool.core.io.FileUtil {
      * @throws Exception
      */
     public static File inputStreamToFile(InputStream ins, String name) throws Exception{
-        File file = new File(System.getProperty("java.io.tmpdir") + name);
+        //Linux System.getProperty("user.dir") 获取到的是当前jar包所在的路径 == /home/java/dev_env/deploy/eladmin
+        //log.error("System.getProperty(\"user.dir\") = " + System.getProperty("user.dir"))
+        //Linux  System.getProperty("java.io.tmpdir")获取到的是 /tmp   后面并没有跟上‘/’
+        File file = new File(System.getProperty("java.io.tmpdir") + System.getProperty("file.separator") + name);
         if (file.exists()) {
             return file;
         }
