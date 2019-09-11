@@ -100,7 +100,7 @@ public class EmailServiceImpl implements EmailService {
                 if (e.getMessage().contains(spam)){
                     //当成垃圾邮件了
                     log.error(e.getMessage());
-                    throw new RuntimeException("该邮件被识别为垃圾邮件，请勾选抄送自己，再重试");
+                    throw new RuntimeException(emailVo.getSubject() + "，该邮件被识别为垃圾邮件，请勾选抄送自己，再重试");
                 }
             }
 

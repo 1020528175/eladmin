@@ -1,8 +1,11 @@
 package me.zhengjie.modules.mall.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -19,6 +22,8 @@ import java.io.Serializable;
 @Entity
 @Data
 @Table(name="mall_goods_monitor")
+@AllArgsConstructor
+@NoArgsConstructor
 public class GoodsMonitor implements Serializable {
 
     /**
@@ -113,6 +118,10 @@ public class GoodsMonitor implements Serializable {
     */
     @Column(name = "update_date")
     private Timestamp updateDate;
+
+    public GoodsMonitor(Long id) {
+        this.id = id;
+    }
 
     public void copy(GoodsMonitor source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

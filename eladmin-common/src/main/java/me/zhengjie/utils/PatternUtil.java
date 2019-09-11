@@ -9,7 +9,14 @@ import java.util.regex.Pattern;
  */
 public class PatternUtil {
 
-    public final static Pattern VIP_PATTERN_PRICE = Pattern.compile("(<em class=\"J-price\">)(\\d+)(<em class=\"price-postfix\">)");
+    /**
+     * <em class="J-price">1998<em class="price-postfix">起</em>  有多个sku时，就有多个价格，显示的默认是最低的价格
+     */
+    public final static Pattern VIP_PATTERN_PRICE_MULTI_SKU = Pattern.compile("(<em class=\"J-price\">)(\\d+)(<em class=\"price-postfix\">)");
+    /**
+     * <em class="J-price">2043</em>  只有一个sku时，就只有一个价格
+     */
+    public final static Pattern VIP_PATTERN_PRICE_ONE_SKU = Pattern.compile("(<em class=\"J-price\">)(\\d+)(</em>)");
     public final static Pattern VIP_PATTERN_TITLE = Pattern.compile("(<p class=\"pib-title-detail\" title=\")(.*)(\">)");
     public final static Pattern VIP_PATTERN_IMAGE = Pattern.compile("(<a href=\")(.*)(\" class=\"J-mer-bigImgZoom\")");
 }
