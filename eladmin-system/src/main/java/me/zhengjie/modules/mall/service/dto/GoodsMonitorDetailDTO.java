@@ -35,10 +35,10 @@ public class GoodsMonitorDetailDTO implements Serializable {
     /**
     * 高于最高监控价
     */
-    private Boolean sendMaxEmail;
+    private boolean sendMaxEmail;
 
     /**
     * 低于最低监控价
     */
-    private Boolean sendMinEmail;
+    private boolean sendMinEmail;
 }

@@ -13,23 +13,37 @@ import me.zhengjie.modules.mall.domain.GoodsMonitor;
 @Data
 public class GoodsMonitorDetailQueryCriteria{
 
-    // 精确
+    /**
+     * 精确
+     */
     @Query
     private Long id;
 
-    // 模糊
-//    @Query(type = Query.Type.INNER_LIKE)
+
+//    @Query(type = Query.Type.INNER_LIKE,joinName = "goodsMonitor",propName = "title")
 //    private GoodsMonitor goodsMonitor
 
-    // 精确
+    /**
+     * 模糊
+     */
+    @Query(type = Query.Type.INNER_LIKE,joinName = "goodsMonitor",propName = "title")
+    private String title;
+
+    /**
+     * 精确
+     */
     @Query
     private Timestamp createDate;
 
-    // 精确
+    /**
+     * 精确
+     */
     @Query
-    private Boolean sendMaxEmail;
+    private boolean sendMaxEmail;
 
-    // 精确
+    /**
+     * 精确
+      */
     @Query
-    private Boolean sendMinEmail;
+    private boolean sendMinEmail;
 }

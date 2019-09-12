@@ -22,7 +22,7 @@ public class GoodsMonitorQueryCriteria{
      * 开启状态
      */
     @Query
-    private boolean openStatus;
+    private Boolean openStatus;
 
     /**
      * 删除状态

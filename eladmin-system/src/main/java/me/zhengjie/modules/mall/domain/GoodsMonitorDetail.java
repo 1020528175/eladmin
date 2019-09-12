@@ -57,13 +57,13 @@ public class GoodsMonitorDetail implements Serializable {
     * 高于最高监控价
     */
     @Column(name = "send_max_email",nullable = false)
-    private Boolean sendMaxEmail;
+    private boolean sendMaxEmail;
 
     /**
     * 低于最低监控价
     */
     @Column(name = "send_min_email",nullable = false)
-    private Boolean sendMinEmail;
+    private boolean sendMinEmail;
 
     public void copy(GoodsMonitorDetail source){
         BeanUtil.copyProperties(source,this, CopyOptions.create().setIgnoreNullValue(true));

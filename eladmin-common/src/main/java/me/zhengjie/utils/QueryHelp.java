@@ -44,6 +44,15 @@ public class QueryHelp {
                     if (ObjectUtil.isNull(val)) {
                         continue;
                     }
+                    /// 可以通过发射获取关联表对象中的字段。但是却不知道这些字段应该用哪种方式来查询，因为@Query注解只有一个查询类型
+//                    Field field1 = val.getClass().getDeclaredField(propName);
+//                    if (field1 != null){
+//                        field1.setAccessible(true);
+//                        String title = field1.get(val).toString();
+//                        field1.setAccessible(false);
+//                    }
+                    ///
+
                     Join join = null;
                     // 模糊多字段
                     if (ObjectUtil.isNotEmpty(blurry)) {
@@ -65,12 +74,18 @@ public class QueryHelp {
                             case RIGHT:
                                 join = root.join(joinName, JoinType.RIGHT);
                                 break;
+                            default: break;
                         }
                     }
                     switch (q.type()) {
                         case EQUAL:
-                            list.add(cb.equal(getExpression(attributeName,join,root)
-                                    .as((Class<? extends Comparable>) fieldType),val));
+                            //.as((Class<? extends Comparable>) fieldType) 2019-9-12 这里出现过问题：as()的本质是转换Expression对象的类型，
+                            //问题现象：GoodsMonitorQueryCriteria类中的openStatus是Boolean对象，但是GoodsMonitor类中的openStatus是boolean基本数据类型，
+                            //跟踪代码可以知道fieldType就是Boolean，root是GoodsMonitor的root对象，获取到openStatus是boolean，这样使用as()方法就是把boolean转换成Boolean，
+                            //这是查询语句就变成了where cast(goodsmonit0_.open_status as char)= ?，这是就肯定查询不到东西了，
+                            //去掉as()方法，不转换Expression的类型就不会有问题，查询语句就是where goodsmonit0_.open_status = ?
+                            //所以使用as()方法转换类型有风险，当查询对象和数据表的映射对象中的字段类型不一致时，转换就会有可能出问题
+                            list.add(cb.equal(getExpression(attributeName,join,root),val));
                             break;
                         case GREATER_THAN:
                             list.add(cb.greaterThanOrEqualTo(getExpression(attributeName,join,root)
@@ -100,6 +115,7 @@ public class QueryHelp {
                                 list.add(getExpression(attributeName,join,root).in((Collection<Long>) val));
                             }
                             break;
+                        default: break;
                     }
                 }
                 field.setAccessible(accessible);
