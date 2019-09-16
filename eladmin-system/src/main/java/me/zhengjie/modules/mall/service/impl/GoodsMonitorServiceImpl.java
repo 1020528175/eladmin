@@ -32,8 +32,10 @@ import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
 * @author masterJ
@@ -109,21 +111,30 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(goodsMonitor.getLink(), String.class);
         String body = responseEntity.getBody();
 
+        //通过正则来获取 商品的标题，图片地址，价格
         //<p class="pib-title-detail" title="周大福 车花镂空足金镯子儿童黄金手镯">周大福 车花镂空足金镯子儿童黄金手镯</p>
-        Matcher titleMatcher = PatternUtil.VIP_PATTERN_TITLE.matcher(body);
+        Matcher titleMatcher = PatternUtil.getPattennTitle(goodsMonitor.getLink()).matcher(body);
         if (titleMatcher.find()){
             System.out.println("matcher1.group(2) = " + titleMatcher.group(2));
             goodsMonitor.setTitle(titleMatcher.group(2));
         }
 
         //<a href="//a.vpimg3.com/upload/merchandise/pdcvis/2019/07/15/7/e3e8d3eb-9124-4d8c-a2c0-89fa8dcf6bbe.jpg" class="J-mer-bigImgZoom" rel="undefined" style="outline-style: none; text-decoration: none;" title="">
-        Matcher imageMatcher = PatternUtil.VIP_PATTERN_IMAGE.matcher(body);
+        Matcher imageMatcher = PatternUtil.getPattennImage(goodsMonitor.getLink()).matcher(body);
         if (imageMatcher.find()){
             System.out.println("matcher1.group(2) = " + imageMatcher.group(2));
             goodsMonitor.setImgUrl(imageMatcher.group(2));
         }
-        goodsMonitor.setOriginMall("唯品会");
+        goodsMonitor.setOriginMall(PatternUtil.getPattennMallName(goodsMonitor.getLink()));
+
+        //获取到商品当前价格
+        goodsMonitor.setCurrentPrice(getPrice(goodsMonitor.getLink(),body));
         return goodsMonitor;
+    }
+
+    @Override
+    public BigDecimal getCurrentPrice(String link) {
+        return getPrice(link,restTemplate.getForEntity(link, String.class).getBody());
     }
 
     @Override
@@ -134,16 +145,8 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
         goodsMonitorDTOS.forEach(goodsMonitorDTO -> {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(goodsMonitorDTO.getLink(), String.class);
             String body = responseEntity.getBody();
-            //通过正则来获取 商品的标题，图片地址，价格
-            Matcher priceMatcherMultiSku = PatternUtil.VIP_PATTERN_PRICE_MULTI_SKU.matcher(body);
-            Matcher priceMatcherOneSku = PatternUtil.VIP_PATTERN_PRICE_ONE_SKU.matcher(body);
             //获取到商品当前价格
-            BigDecimal price = null;
-            if (priceMatcherMultiSku.find()){
-                price = new BigDecimal(priceMatcherMultiSku.group(2));
-            }else if (priceMatcherOneSku.find()){
-                price = new BigDecimal(priceMatcherOneSku.group(2));
-            }
+            BigDecimal price = getPrice(goodsMonitorDTO.getLink(),body);
             if (price != null){
                 //保存定时任务执行记录
                 saveGoodsMonitorDetail(goodsMonitorDTO,price);
@@ -232,6 +235,46 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
     }
 
     /**
+     * 通过链接获取价格
+     * @param link 商品的链接
+     * @return
+     */
+    private BigDecimal getPrice(String link, String body) {
+        BigDecimal price = null;
+        switch (link.substring(0, link.indexOf("com/") + 4)) {
+            case PatternUtil.VIP_LINK:
+                Matcher priceMatcherMultiSku = PatternUtil.getPattennMultiSkuPrice(link).matcher(body);
+                Matcher priceMatcherOneSku = PatternUtil.getPattennOneSkuPrice(link).matcher(body);
+                if (priceMatcherMultiSku.find()) {
+                    price = new BigDecimal(priceMatcherMultiSku.group(2));
+                } else if (priceMatcherOneSku.find()) {
+                    price = new BigDecimal(priceMatcherOneSku.group(2));
+                }
+                return price;
+            case PatternUtil.JD_LINK:
+                //https://item.jd.com/5277056.html#crumb-wrap
+                String sku = link.substring(link.lastIndexOf("/") + 1,link.lastIndexOf("."));
+                body = restTemplate.getForObject(String.format(PatternUtil.JD_PRICE_LINK, sku), String.class);
+                Map map = JSONObject.parseObject(body, Map.class);
+                Map<String,Object> stock = (Map<String, Object>) map.get("stock");
+                Map<String,Object> jdPrice = (Map<String, Object>) stock.get("jdPrice");
+                String p = jdPrice.get("p").toString();
+                return new BigDecimal(p);
+            case PatternUtil.TAOBAO_LINK:
+                Matcher taobaoPriceMatcher = PatternUtil.getPattennMultiSkuPrice(link).matcher(body);
+                if (taobaoPriceMatcher.find()) {
+                    price = new BigDecimal(taobaoPriceMatcher.group(2));
+                }
+                return price;
+            case PatternUtil.TMALL_LINK:
+                return new BigDecimal(-99);
+            default:
+                return new BigDecimal(0);
+        }
+    }
+
+
+    /**
      * 封装监控记录goodsMonitorDetail 保存到数据库
      * @param goodsMonitorDTO
      * @param price
@@ -248,5 +291,7 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
         }
         goodsMonitorDetailRepository.save(goodsMonitorDetail);
     }
+
+
 
 }

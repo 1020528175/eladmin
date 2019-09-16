@@ -15,6 +15,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+
 /**
 * @author masterJ
 * @date 2019-09-06
@@ -66,10 +69,18 @@ public class GoodsMonitorController {
     @GetMapping(value = "/getGoodsInfo")
     @PreAuthorize("hasAnyRole('ADMIN','GOODSMONITOR_ALL','GOODSMONITOR_SELECT')")
     public ResponseEntity getGoodsInfo(String link){
-        System.out.println("link = " + link);
         GoodsMonitor goodsMonitor = new GoodsMonitor();
         goodsMonitor.setLink(link);
         return new ResponseEntity(goodsMonitorService.getGoodsInfo(goodsMonitor),HttpStatus.OK);
     }
+
+    @Log("查询商品现在价格")
+    @ApiOperation(value = "查询商品现在价格")
+    @GetMapping(value = "/getCurrentPrice")
+    @PreAuthorize("hasAnyRole('ADMIN','GOODSMONITOR_ALL','GOODSMONITOR_SELECT')")
+    public ResponseEntity<BigDecimal> getCurrentPrice(@NotNull String link){
+        return new ResponseEntity(goodsMonitorService.getCurrentPrice(link),HttpStatus.OK);
+    }
+
 
 }

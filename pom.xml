@@ -71,6 +71,11 @@
 <!--            <artifactId>spring-boot-starter-cache</artifactId>-->
 <!--        </dependency>-->
         <!-- redis -->
+        <!-- spring-boot-starter-data-redis 默认使用的是lettuce连接池，但是不知道为什么有一台电脑上跑时，总是报：
+         org.springframework.dao.QueryTimeoutException: Redis command timed out; nested exception is io.lettuce.core.RedisCommandTimeoutException: Command timed out after 5 second(s)
+         另一台电脑上跑，却不报这个错误。配连接的超时时间也没用，过几分钟后，再连接redis时就会出这个错误，后面百度上说的是不使用lettuce连接池，而使用jedis连接池，
+         这样导包就是为了使用jedis连接池，确实换成jedis连接池后就没出现这个错误了。
+         -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

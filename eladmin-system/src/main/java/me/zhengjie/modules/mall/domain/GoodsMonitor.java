@@ -64,6 +64,12 @@ public class GoodsMonitor implements Serializable {
     private String originMall;
 
     /**
+    * 现价
+    */
+    @Column(name = "current_price")
+    private BigDecimal currentPrice;
+
+    /**
     * 最高价
     */
     @Column(name = "max_price")

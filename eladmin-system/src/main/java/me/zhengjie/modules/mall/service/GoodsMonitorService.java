@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -71,6 +72,13 @@ public interface GoodsMonitorService {
      */
     @Cacheable(key = "#goodsMonitor.link")
     GoodsMonitor getGoodsInfo(GoodsMonitor goodsMonitor);
+
+    /**
+     * 通过商品链接，获取商品的当前价格
+     * @param link 商品链接
+     * @return
+     */
+    BigDecimal getCurrentPrice(String link);
 
     /**
      * 监控商品价格变动
