@@ -39,11 +39,11 @@ public class GoodsMonitorDetailQueryCriteria{
      * 精确
      */
     @Query
-    private boolean sendMaxEmail;
+    private Boolean sendMaxEmail;
 
     /**
      * 精确
       */
     @Query
-    private boolean sendMinEmail;
+    private Boolean sendMinEmail;
 }
