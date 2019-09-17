@@ -30,7 +30,7 @@ public class WechatConfigServiceImpl implements WechatConfigService {
     @Override
     public WechatConfig findOne(WechatConfigQueryCriteria criteria){
         Optional<WechatConfig> optional = wechatConfigRepository.findOne((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root, criteria, criteriaBuilder));
-        return optional.get();
+        return optional.isPresent() ? optional.get() : new WechatConfig();
     }
 
 

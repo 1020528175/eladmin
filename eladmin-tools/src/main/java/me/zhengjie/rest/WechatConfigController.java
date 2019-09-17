@@ -42,4 +42,6 @@ public class WechatConfigController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+
+
 }
