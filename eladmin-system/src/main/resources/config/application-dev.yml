@@ -1,7 +1,7 @@
 server:
   servlet:
     context-path: /eladmin
-#  port: 5188
+  port: 5188
 #配置数据源
 spring:
   datasource:
