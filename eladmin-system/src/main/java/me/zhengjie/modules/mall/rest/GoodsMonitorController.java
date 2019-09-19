@@ -17,6 +17,7 @@ import io.swagger.annotations.*;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
 * @author masterJ
@@ -55,6 +56,15 @@ public class GoodsMonitorController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
+    @Log("修改GoodsMonitor的开启状态")
+    @ApiOperation(value = "修改GoodsMonitor开启状态")
+    @PutMapping(value = "/updateOpenStatusById")
+    @PreAuthorize("hasAnyRole('ADMIN','GOODSMONITOR_ALL','GOODSMONITOR_EDIT')")
+    public ResponseEntity updateOpenStatusById(@RequestBody Map<String,String> map){
+        goodsMonitorService.updateOpenStatusById(Long.parseLong(map.get("id")),Boolean.parseBoolean(map.get("openStatus")));
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
     @Log("删除GoodsMonitor")
     @ApiOperation(value = "删除GoodsMonitor")
     @DeleteMapping(value = "/goodsMonitor/{id}")
@@ -63,6 +73,7 @@ public class GoodsMonitorController {
         goodsMonitorService.delete(id);
         return new ResponseEntity(HttpStatus.OK);
     }
+
 
     @Log("查询GoodsInfo")
     @ApiOperation(value = "查询GoodsInfo")

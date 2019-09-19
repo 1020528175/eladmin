@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -57,6 +58,14 @@ public interface GoodsMonitorService {
      */
     @CacheEvict(allEntries = true)
     void update(GoodsMonitor resources);
+
+    /**
+     * 修改商品监控的开启状态
+     * @param id
+     * @param openStatus
+     */
+    @CacheEvict(allEntries = true)
+    void updateOpenStatusById(@Param("id") Long id, @Param("openStatus") boolean openStatus);
 
     /**
      * delete

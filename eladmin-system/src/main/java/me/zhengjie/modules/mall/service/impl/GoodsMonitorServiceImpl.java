@@ -102,6 +102,12 @@ public class GoodsMonitorServiceImpl implements GoodsMonitorService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void updateOpenStatusById(Long id, boolean openStatus) {
+        goodsMonitorRepository.updateOpenStatusById(id,openStatus);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         goodsMonitorRepository.deleteById(id);
     }
