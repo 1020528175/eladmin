@@ -35,7 +35,7 @@ public class MenuController {
     @Autowired
     private RoleService roleService;
 
-    private static final String ENTITY_NAME = "menu";
+    private static final String ENTITY_NAME = "wechat-menu-example";
 
     /**
      * 构建前端路由所需要的菜单

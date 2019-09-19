@@ -1,11 +1,15 @@
 package me.zhengjie.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.DigestUtils;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.IvParameterSpec;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * 加密
@@ -92,5 +96,38 @@ public class EncryptUtils {
      */
     public static String encryptPassword(String password){
         return  DigestUtils.md5DigestAsHex(password.getBytes());
+    }
+
+
+
+
+    /**
+     * sha1加密
+     * 计算字符串的hash值
+     * @param string    明文
+     * @return 字符串的hash值
+     */
+    public static String sha1(String string) {
+        if (StringUtils.isBlank(string)) {
+            return "";
+        }
+        try {
+            MessageDigest hash = MessageDigest.getInstance("SHA1");
+            byte[] bytes = hash.digest(string.getBytes("UTF-8"));
+            String result = "";
+            for (byte b : bytes) {
+                String temp = Integer.toHexString(b & 0xff);
+                if (temp.length() == 1) {
+                    temp = "0" + temp;
+                }
+                result += temp;
+            }
+            return result;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
