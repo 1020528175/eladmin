@@ -78,7 +78,7 @@ public class EmailServiceImpl implements EmailService {
         }
         account.setFrom(emailConfig.getUser()+"<"+emailConfig.getFromUser()+">");
         //ssl方式发送
-        account.setStartttlsEnable(true);
+        account.setStarttlsEnable(true);
         String content = emailVo.getContent();
         /**
          * 发送
