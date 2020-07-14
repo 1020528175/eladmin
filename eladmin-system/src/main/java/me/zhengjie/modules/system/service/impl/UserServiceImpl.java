@@ -1,16 +1,19 @@
 package me.zhengjie.modules.system.service.impl;
 
 import me.zhengjie.modules.monitor.service.RedisService;
+import me.zhengjie.modules.system.domain.Job;
 import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.exception.EntityExistException;
 import me.zhengjie.exception.EntityNotFoundException;
 import me.zhengjie.modules.system.repository.UserRepository;
+import me.zhengjie.modules.system.service.JobService;
 import me.zhengjie.modules.system.service.UserService;
 import me.zhengjie.modules.system.service.dto.UserDTO;
 import me.zhengjie.modules.system.service.dto.UserQueryCriteria;
 import me.zhengjie.modules.system.service.mapper.UserMapper;
 import me.zhengjie.utils.PageUtil;
 import me.zhengjie.utils.QueryHelp;
+import me.zhengjie.utils.StringUtils;
 import me.zhengjie.utils.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,8 +21,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author Zheng Jie
@@ -38,10 +45,31 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RedisService redisService;
 
+    @Autowired
+    private JobService jobService;
+
+
     @Override
     public Object queryAll(UserQueryCriteria criteria, Pageable pageable) {
         Page<User> page = userRepository.findAll((root, criteriaQuery, criteriaBuilder) -> QueryHelp.getPredicate(root,criteria,criteriaBuilder),pageable);
         return PageUtil.toPage(page.map(userMapper::toDto));
+    }
+
+    @Override
+    public List<String> getEmailByJob(String stock, String bond) {
+        Job stockJob = jobService.findByName(stock);
+        List<User> users = userRepository.findByJob(stockJob);
+
+        Job bondJob = jobService.findByName(bond);
+        users.addAll(userRepository.findByJob(bondJob));
+        return users.parallelStream().map(User::getEmail).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getEmailByJob(String stock) {
+        Job stockJob = jobService.findByName(stock);
+        List<User> users = userRepository.findByJob(stockJob);
+        return users.parallelStream().map(User::getEmail).collect(Collectors.toList());
     }
 
     @Override
@@ -125,6 +153,11 @@ public class UserServiceImpl implements UserService {
         } else {
             return userMapper.toDto(user);
         }
+    }
+
+    @Override
+    public List<User> findByJob(Job job) {
+        return userRepository.findByJob(job);
     }
 
     @Override

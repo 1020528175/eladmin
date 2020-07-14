@@ -52,4 +52,7 @@ public interface JobService {
      * @return
      */
     Object queryAll(JobQueryCriteria criteria, Pageable pageable);
+
+    @Cacheable(key = "'findByName:' + #p0")
+    Job findByName(String name);
 }

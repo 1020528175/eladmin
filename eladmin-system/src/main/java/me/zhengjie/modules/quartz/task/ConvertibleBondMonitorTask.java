@@ -1,20 +1,32 @@
 package me.zhengjie.modules.quartz.task;
 
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.annotations.AuthorizationScope;
 import lombok.extern.slf4j.Slf4j;
 import me.zhengjie.domain.EmailConfig;
 import me.zhengjie.domain.vo.EmailVo;
+import me.zhengjie.modules.stock.domain.StockMonitor;
+import me.zhengjie.modules.stock.service.StockMonitorService;
+import me.zhengjie.modules.stock.util.ConstantUtil;
+import me.zhengjie.modules.system.domain.Job;
+import me.zhengjie.modules.system.domain.User;
+import me.zhengjie.modules.system.service.JobService;
+import me.zhengjie.modules.system.service.UserService;
+import me.zhengjie.modules.system.service.dto.JobDTO;
+import me.zhengjie.modules.system.service.dto.UserDTO;
 import me.zhengjie.service.EmailService;
 import me.zhengjie.utils.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author master
@@ -31,24 +43,41 @@ public class ConvertibleBondMonitorTask {
     private static final String INTERCEPT_END = "]";
 
     /**
+     * 可转债编码
+     */
+    private static final String BOND_CODE = "BONDCODE";
+
+    /**
+     * 可转债中文名
+     */
+    private static final String SNAME = "SNAME";
+
+    /**
      * 申购时间的字段名
      */
-    private static final String  PURCHASE_DATE ="STARTDATE";
+    private static final String PURCHASE_DATE = "STARTDATE";
 
     /**
      * 中签时间的字段名
      */
-    private static final String  ZQ_DATE ="ZQHDATE";
+    private static final String ZQ_DATE = "ZQHDATE";
 
     /**
      * 上市时间的字段名
      */
-    private static final String  LISt_DATE ="LISTDATE";
+    private static final String LIST_DATE = "LISTDATE";
 
     /**
-     * 邮件发送给谁
+     * 可转债操盘手
      */
-    private static final String toEmail = "1020528175@qq.com";
+    @Value("${send.bond}")
+    private String bond;
+
+    /**
+     * 股市操盘手
+     */
+    @Value(("${send.stock}"))
+    private String stock;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -56,8 +85,16 @@ public class ConvertibleBondMonitorTask {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private StockMonitorService stockMonitorService;
 
-    public void run(){
+    @Autowired
+    private UserService userService;
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+
+    public List<Map> getData() {
         String html = restTemplate.getForObject(url, String.class);
         String data = StringUtils.substringBetween(html, INTERCEPT_START, INTERCEPT_END);
         data = "[" + data + "]";
@@ -67,32 +104,42 @@ public class ConvertibleBondMonitorTask {
         //SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         List<Map> maps = JSONObject.parseArray(data, Map.class);
 
+        return maps;
+    }
+
+
+
+    /**
+     * 定时监控可转债申购提醒
+     */
+    public void runBuy() {
+        List<Map> maps = getData();
         for (Map map : maps) {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            if (map.get(PURCHASE_DATE) != null && map.get(PURCHASE_DATE).toString().startsWith(simpleDateFormat.format(new Date()))){
+            if (map.get(PURCHASE_DATE) != null && map.get(PURCHASE_DATE).toString().startsWith(simpleDateFormat.format(new Date()))) {
                 //发送申购提示邮件
                 EmailConfig emailConfig = emailService.find();
                 //封装发送邮件对象
-                EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(toEmail))
-                        .subject("重要提示：今日有可转债基金申购！！！")
-                        .content("重要提示：今日有可转债基金申购，千万不要错过；详情请见：" + url).build();
+
+                EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(userService.getEmailByJob(stock, bond))
+                        .subject("重要：今日有可转债基金申购！！！")
+                        .content("重要：今日有可转债基金申购，千万不要错过；详情请见：" + url).build();
                 try {
-                    emailService.send(emailVo,emailConfig);
+                    emailService.send(emailVo, emailConfig);
                     log.info("---------------------------------发送申购提示邮件成功---------------------------------");
                 } catch (Exception e) {
                     log.error("---------------------------------发送申购提示邮件失败---------------------------------");
                     e.printStackTrace();
                 }
                 return;
-            }else if (map.get(ZQ_DATE) != null && map.get(ZQ_DATE).toString().startsWith(simpleDateFormat.format(new Date()))){
+            } else if (map.get(ZQ_DATE) != null && map.get(ZQ_DATE).toString().startsWith(simpleDateFormat.format(new Date()))) {
                 //发送查看中签情况提示邮件
                 EmailConfig emailConfig = emailService.find();
                 //封装发送邮件对象
-                EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(toEmail))
-                        .subject("重要提示：可转债基金公布中签情况啦！！！")
-                        .content("重要提示：可转债基金公布中签情况啦；记得查看哦，祝你好运天天到！！！").build();
+                EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(userService.getEmailByJob(stock, bond))
+                        .subject("重要：可转债基金公布中签情况啦！！！")
+                        .content("重要：可转债基金公布中签情况啦；记得查看哦，祝你好运天天到！！！").build();
                 try {
-                    emailService.send(emailVo,emailConfig);
+                    emailService.send(emailVo, emailConfig);
                     log.info("---------------------------------发送查看中签情况提示邮件成功---------------------------------");
                 } catch (Exception e) {
                     log.error("---------------------------------发送查看中签情况提示邮件失败---------------------------------");
@@ -101,10 +148,47 @@ public class ConvertibleBondMonitorTask {
                 return;
             }
         }
+    }
 
-        //增加对中签的可转债基金上市时间的提示，需要读数据库-- 没加了
 
-
+    /**
+     * 定时执行监控已中可转债上市提醒
+     */
+    public void runSell() {
+        List<Map> maps = getData();
+        List<StockMonitor> stockMonitors = new ArrayList<>();
+        for (Map map : maps) {
+            if (map.get(LIST_DATE) != null && !map.get(LIST_DATE).equals("-") && map.get(LIST_DATE).toString().startsWith(simpleDateFormat.format(new Date()))) {
+                // 增加对中签的可转债基金上市时间的提示
+                // 如果上市时间不为空，且上市时间是今天的，就要检查，我有没有中签的今天上市
+                if (stockMonitors.size() == 0) {
+                    stockMonitors = stockMonitorService.findByType(ConstantUtil.TYPE_BOND);
+                }
+                if (stockMonitors.size() > 0) {
+                    stockMonitors.stream().forEach(stockMonitor -> {
+                        // 123038   这里获取到的代码  和实际上市的证券代码会不一样
+                        System.out.println("stockMonitor = " + stockMonitor);
+                        if (stockMonitor.getName().equals(map.get(SNAME))) {
+                            // 说明有中了的可转债当天上市
+                            //发送查看中签情况提示邮件
+                            EmailConfig emailConfig = emailService.find();
+                            //封装发送邮件对象
+                            UserDTO userDTO = userService.findByName(stockMonitor.getCreateBy());
+                            EmailVo emailVo = EmailVo.builder().ccs(Arrays.asList(emailConfig.getFromUser())).tos(Arrays.asList(userDTO.getEmail()))
+                                    .subject("重要：有已中可转债（" + stockMonitor.getName() + "）今日上市！！！")
+                                    .content("重要：有已中可转债（" + stockMonitor.getName() + "）今日上市！！！，请坚守原则，今日卖出。。。").build();
+                            try {
+                                emailService.send(emailVo, emailConfig);
+                                log.info("---------------------------------发送可转债上市提示邮件成功---------------------------------");
+                            } catch (Exception e) {
+                                log.error("---------------------------------发送可转债上市提示邮件失败---------------------------------");
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
 }

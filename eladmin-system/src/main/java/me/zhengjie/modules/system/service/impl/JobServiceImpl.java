@@ -48,6 +48,12 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public Job findByName(String name) {
+        Job job = jobRepository.findByName(name);
+        return job;
+    }
+
+    @Override
     public JobDTO findById(Long id) {
         Optional<Job> job = jobRepository.findById(id);
         ValidationUtil.isNull(job,"Job","id",id);

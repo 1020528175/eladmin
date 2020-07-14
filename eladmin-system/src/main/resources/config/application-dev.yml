@@ -11,11 +11,10 @@ spring:
       driverClassName: com.mysql.cj.jdbc.Driver
 #      url: jdbc:mysql://192.168.1.101:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8&useSSL=false
       url: jdbc:mysql://39.100.224.233:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8
-#      url: jdbc:mysql://172.17.0.2:3306/eladmin?serverTimezone=Asia/Shanghai&characterEncoding=utf8
-#      username: eladmin
-#      password: eladmin
-      username: root
-      password: root
+      username: eladmin
+      password: eladmin
+#      username: root
+#      password: root
 
       # 初始化配置
       initial-size: 3
@@ -59,6 +58,7 @@ spring:
     jedis:
       pool:
         min-idle: 3
+#    password: bu$yao@gong#ji%wo^
 
 #    lettuce:
 #      pool:
@@ -120,3 +120,20 @@ loginCode:
 #垃圾邮件识别码配置，支持数组，如：554 DT:SPM,554 DT:SPM   网易的是554 DT:SPM
 email:
   spam: 554 DT:SPM
+
+
+custom:
+  stock:
+    #实时获取股票当天信息地址  http://hq.sinajs.cn/list=sz000001
+    #返回结果：JSON实时数据，以逗号隔开相关数据，数据依次是“股票名称、今日开盘价、昨日收盘价、当前价格、今日最高价、今日最低价、竞买价、竞卖价、成交股数、成交金额、买1手、买1报价、买2手、买2报价、…、买5报价、…、卖5报价、日期、时间”。
+    current_time_url: http://hq.sinajs.cn/list=
+
+#send:
+#  toEmail: 1020528175@qq.com
+
+
+send:
+  stock: 股市操盘手
+  bond: 可转债操盘手
+
+

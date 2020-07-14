@@ -1,5 +1,6 @@
 package me.zhengjie;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import me.zhengjie.utils.SpringContextHolder;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,6 +23,9 @@ public class AppRun {
 
     @Bean
     public SpringContextHolder springContextHolder() {
+        // 解决 com.alibaba.fastjson.JSONException: autoType is not support   打开AutoType功能
+        ParserConfig.getGlobalInstance().addAccept("me.zhengjie.modules.stock");
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
         return new SpringContextHolder();
     }
 }

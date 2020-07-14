@@ -1,5 +1,6 @@
 package me.zhengjie.modules.system.repository;
 
+import me.zhengjie.modules.system.domain.Job;
 import me.zhengjie.modules.system.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,13 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
      * @return
      */
     User findByEmail(String email);
+
+    /**
+     * findByJob
+     * @param job
+     * @return
+     */
+    List<User> findByJob(Job job);
 
     /**
      * 修改密码

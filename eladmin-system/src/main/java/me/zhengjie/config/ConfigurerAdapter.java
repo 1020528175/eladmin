@@ -3,6 +3,7 @@ package me.zhengjie.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -35,6 +37,20 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 
     }
 
+    /**
+     * 解决这个 getStockNameByCode方法  返回中文字符串乱码问题，没有这个配置，返回的如果是对象，对象中的中文却不会乱码
+     * @return
+     */
+    @Bean
+    public HttpMessageConverter<String> responseBodyStringConverter() {
+        return new StringHttpMessageConverter(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(responseBodyStringConverter());
+    }
+
 // 可解决Long 类型在 前端精度丢失的问题， 如不想全局 直接添加注解 @JsonSerialize(using= ToStringSerializer.class) 到相应的字段
 
 //    @Override
@@ -53,6 +69,9 @@ public class ConfigurerAdapter implements WebMvcConfigurer {
 //        converters.add(jackson2HttpMessageConverter);
 //        converters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));
 //    }
+
+
+
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
